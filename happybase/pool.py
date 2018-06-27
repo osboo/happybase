@@ -4,7 +4,7 @@ HappyBase connection pool module.
 
 import contextlib
 import logging
-import Queue
+import queue as Queue
 import socket
 import threading
 
@@ -67,7 +67,7 @@ class ConnectionPool(object):
         connection_kwargs = kwargs
         connection_kwargs['autoconnect'] = False
 
-        for i in xrange(size):
+        for i in range(size):
             connection = Connection(**connection_kwargs)
             self._queue.put(connection)
 

@@ -2,8 +2,7 @@ from os.path import join, dirname
 from setuptools import find_packages, setup
 
 __version__ = None
-execfile('happybase/_version.py')
-
+exec(open('happybase/_version.py', 'r').read())
 
 def get_file_contents(filename):
     with open(join(dirname(__file__), filename)) as fp:

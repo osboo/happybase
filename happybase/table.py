@@ -21,7 +21,7 @@ pack_i64 = Struct('>q').pack
 def make_row(cell_map, include_timestamp):
     """Make a row dict for a cell mapping like ttypes.TRowResult.columns."""
     cellfn = include_timestamp and make_cell_timestamp or make_cell
-    return dict((cn, cellfn(cell)) for cn, cell in cell_map.iteritems())
+    return dict((cn, cellfn(cell)) for cn, cell in cell_map.items())
 
 
 def make_ordered_row(sorted_columns, include_timestamp):
@@ -215,7 +215,7 @@ class Table(object):
     def scan(self, row_start=None, row_stop=None, row_prefix=None,
              columns=None, filter=None, timestamp=None,
              include_timestamp=False, batch_size=1000, scan_batching=None,
-             limit=None, sorted_columns=False):
+             limit=None, sorted_columns=False, reverse=False):
         """Create a scanner for data in the table.
 
         This method returns an iterable that can be used for looping over the
@@ -310,8 +310,12 @@ class Table(object):
                     "'row_prefix' cannot be combined with 'row_start' "
                     "or 'row_stop'")
 
-            row_start = row_prefix
-            row_stop = str_increment(row_prefix)
+            if reverse:
+                row_start = str_increment(row_prefix)
+                row_stop = row_prefix
+            else:
+                row_start = row_prefix
+                row_stop = str_increment(row_prefix)
 
         if row_start is None:
             row_start = ''
@@ -369,6 +373,7 @@ class Table(object):
                 filterString=filter,
                 batchSize=scan_batching,
                 sortColumns=sorted_columns,
+                reversed=reverse,
             )
             scan_id = self.connection.client.scannerOpenWithScan(
                 self.name, scan, {})

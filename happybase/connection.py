@@ -10,8 +10,7 @@ from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TSaslClientTransport
 from thrift.protocol import TBinaryProtocol, TCompactProtocol
 
-from .hbase import Hbase
-from .hbase.ttypes import ColumnDescriptor
+from .hbase.Hbase import Client, ColumnDescriptor
 from .table import Table
 from .util import pep8_to_camel_case
 
@@ -129,10 +128,10 @@ class Connection(object):
                              % ", ".join(THRIFT_TRANSPORTS.keys()))
 
         if table_prefix is not None \
-                and not isinstance(table_prefix, basestring):
+                and not isinstance(table_prefix, str):
             raise TypeError("'table_prefix' must be a string")
 
-        if not isinstance(table_prefix_separator, basestring):
+        if not isinstance(table_prefix_separator, str):
             raise TypeError("'table_prefix_separator' must be a string")
 
         if compat not in COMPAT_MODES:
@@ -173,7 +172,7 @@ class Connection(object):
         if self.use_kerberos:
             self.transport = TSaslClientTransport(self.transport, self.host, self.sasl_service_name)
         protocol = self._protocol_class(self.transport)
-        self.client = Hbase.Client(protocol)
+        self.client = Client(protocol)
 
     def _table_name(self, name):
         """Construct a table name by optionally adding a table name prefix."""
@@ -309,7 +308,7 @@ class Connection(object):
                 % name)
 
         column_descriptors = []
-        for cf_name, options in families.iteritems():
+        for cf_name, options in families.items():
             if options is None:
                 options = dict()
 

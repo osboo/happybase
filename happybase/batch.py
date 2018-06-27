@@ -45,7 +45,7 @@ class Batch(object):
 
     def send(self):
         """Send the batch to the server."""
-        bms = [BatchMutation(row, m) for row, m in self._mutations.iteritems()]
+        bms = [BatchMutation(row, m) for row, m in self._mutations.items()]
         if not bms:
             return
 
