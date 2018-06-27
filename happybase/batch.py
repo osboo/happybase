@@ -80,7 +80,7 @@ class Batch(object):
                 column=column,
                 value=value,
                 writeToWAL=wal)
-            for column, value in data.iteritems())
+            for column, value in data.items())
 
         self._mutation_count += len(data)
         if self._batch_size and self._mutation_count >= self._batch_size:
