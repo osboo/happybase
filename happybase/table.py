@@ -207,10 +207,10 @@ class Table(object):
             cells = self.connection.client.getVerTs(
                 self.name, row, column, timestamp, versions, {})
 
-        if include_timestamp:
-            return map(make_cell_timestamp, cells)
-        else:
-            return map(make_cell, cells)
+        return [
+            (c.value, c.timestamp) if include_timestamp else c.value
+            for c in cells
+        ]
 
     def scan(self, row_start=None, row_stop=None, row_prefix=None,
              columns=None, filter=None, timestamp=None,
