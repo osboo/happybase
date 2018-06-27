@@ -5,6 +5,9 @@ These functions are not part of the public API.
 """
 
 import re
+import six
+
+from six.moves import range
 
 CAPITALS = re.compile('([A-Z])')
 
@@ -54,18 +57,18 @@ def thrift_type_to_dict(obj):
                 for attr in thrift_attrs(obj))
 
 
-def str_increment(s):
+def bytes_increment(b):
     """Increment and truncate a byte string (for sorting purposes)
-
     This functions returns the shortest string that sorts after the given
     string when compared using regular string comparison semantics.
-
     This function increments the last byte that is smaller than ``0xFF``, and
     drops everything after it. If the string only contains ``0xFF`` bytes,
     `None` is returned.
     """
-    for i in range(len(s) - 1, -1, -1):
-        if s[i] != '\xff':
-            return s[:i] + chr(ord(s[i]) + 1)
-
+    assert isinstance(b, six.binary_type)
+    b = bytearray(b)  # Used subset of its API is the same on Python 2 and 3.
+    for i in range(len(b) - 1, -1, -1):
+        if b[i] != 0xff:
+            b[i] += 1
+            return bytes(b[:i+1])
     return None

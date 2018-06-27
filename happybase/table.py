@@ -8,7 +8,7 @@ from operator import attrgetter
 from struct import Struct
 
 from .hbase.ttypes import TScan
-from .util import thrift_type_to_dict, str_increment, OrderedDict
+from .util import thrift_type_to_dict, bytes_increment, OrderedDict
 from .batch import Batch
 
 logger = logging.getLogger(__name__)
@@ -311,11 +311,11 @@ class Table(object):
                     "or 'row_stop'")
 
             if reverse:
-                row_start = str_increment(row_prefix)
+                row_start = bytes_increment(row_prefix)
                 row_stop = row_prefix
             else:
                 row_start = row_prefix
-                row_stop = str_increment(row_prefix)
+                row_stop = bytes_increment(row_prefix)
 
         if row_start is None:
             row_start = ''
@@ -388,11 +388,8 @@ class Table(object):
                 else:
                     how_many = min(batch_size, limit - n_returned)
 
-                if how_many == 1:
-                    items = self.connection.client.scannerGet(scan_id)
-                else:
-                    items = self.connection.client.scannerGetList(
-                        scan_id, how_many)
+                items = self.connection.client.scannerGetList(
+                    scan_id, how_many)
 
                 if not items:
                     break  # scan has finished
