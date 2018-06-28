@@ -6,6 +6,8 @@ from collections import defaultdict
 import logging
 from numbers import Integral
 
+import six
+
 from .hbase.ttypes import BatchMutation, Mutation
 
 logger = logging.getLogger(__name__)
@@ -45,7 +47,10 @@ class Batch(object):
 
     def send(self):
         """Send the batch to the server."""
-        bms = [BatchMutation(row, m) for row, m in self._mutations.items()]
+        bms = [
+            BatchMutation(row, m)
+            for row, m in six.iteritems(self._mutations)
+        ]
         if not bms:
             return
 
@@ -80,7 +85,7 @@ class Batch(object):
                 column=column,
                 value=value,
                 writeToWAL=wal)
-            for column, value in data.items())
+            for column, value in six.iteritems(data))
 
         self._mutation_count += len(data)
         if self._batch_size and self._mutation_count >= self._batch_size:
