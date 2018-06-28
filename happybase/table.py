@@ -292,6 +292,7 @@ class Table(object):
         :param bool scan_batching: server-side scan batching (optional)
         :param int limit: max number of rows to return
         :param bool sorted_columns: whether to return sorted columns
+        :param bool reverse: whether to perform scan in reverse
 
         :return: generator yielding the rows matching the scan
         :rtype: iterable of `(row_key, row_data)` tuples
@@ -308,6 +309,10 @@ class Table(object):
         if sorted_columns and self.connection.compat < '0.96':
             raise NotImplementedError(
                 "'sorted_columns' is only supported in HBase >= 0.96")
+
+        if reverse and self.connection.compat < '0.98':
+            raise NotImplementedError(
+                "'reverse' is only supported in HBase >= 0.98")
 
         if row_prefix is not None:
             if row_start is not None or row_stop is not None:
