@@ -79,7 +79,7 @@ class Table(object):
         :rtype: list of dicts
         """
         regions = self.connection.client.getTableRegions(self.name)
-        return map(thrift_type_to_dict, regions)
+        return [thrift_type_to_dict(r) for r in regions]
 
     #
     # Data retrieval
