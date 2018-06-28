@@ -72,3 +72,15 @@ def bytes_increment(b):
             b[i] += 1
             return bytes(b[:i+1])
     return None
+
+
+def ensure_bytes(str_or_bytes, binary_type=six.binary_type,
+                 text_type=six.text_type):
+    """Convert text into bytes, and leaves bytes as-is."""
+    if isinstance(str_or_bytes, binary_type):
+        return str_or_bytes
+    if isinstance(str_or_bytes, text_type):
+        return str_or_bytes.encode('utf-8')
+    raise TypeError(
+        "input must be a text or byte string, got {}"
+        .format(type(str_or_bytes).__name__))

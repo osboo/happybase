@@ -6,17 +6,20 @@ HappyBase connection module.
 
 import logging
 
+import six
 from thrift.transport.TSocket import TSocket
 from thrift.transport.TTransport import TBufferedTransport, TFramedTransport, TSaslClientTransport
 from thrift.protocol import TBinaryProtocol, TCompactProtocol
 
 from .hbase.Hbase import Client, ColumnDescriptor
 from .table import Table
-from .util import pep8_to_camel_case
+from .util import pep8_to_camel_case, ensure_bytes
 
 logger = logging.getLogger(__name__)
 
-COMPAT_MODES = ('0.90', '0.92', '0.94', '0.96')
+STRING_OR_BINARY = (six.binary_type, six.text_type)
+
+COMPAT_MODES = ('0.90', '0.92', '0.94', '0.96', '0.98')
 THRIFT_TRANSPORTS = dict(
     buffered=TBufferedTransport,
     framed=TFramedTransport,
@@ -29,7 +32,7 @@ THRIFT_PROTOCOLS = dict(
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = 9090
 DEFAULT_TRANSPORT = 'buffered'
-DEFAULT_COMPAT = '0.96'
+DEFAULT_COMPAT = '0.98'
 DEFAULT_PROTOCOL = 'binary'
 
 
@@ -90,8 +93,7 @@ class Connection(object):
     `sasl_service_name` is not required, as it is inferred from the host passed
     to the connection. Note that for using `use_kerberos` you need to also have
     the Python modules ``puresasl`` and ``kerberos`` installed. The latter
-    module works only with Python 2.7.0+ due to reliance on Capsule features.
-    As such, this feature can only be used on Python 2.7 onwards.
+    module works only with Python 3.4.0+ due to reliance on Capsule features.
 
     .. versionadded:: 0.10
        `use_kerberos` and `sasl_service_name` arguments
@@ -119,7 +121,7 @@ class Connection(object):
     """
     def __init__(self, host=DEFAULT_HOST, port=DEFAULT_PORT, timeout=None,
                  autoconnect=True, table_prefix=None,
-                 table_prefix_separator='_', compat=DEFAULT_COMPAT,
+                 table_prefix_separator=b'_', compat=DEFAULT_COMPAT,
                  transport=DEFAULT_TRANSPORT, protocol=DEFAULT_PROTOCOL,
                  use_kerberos=False, sasl_service_name='hbase'):
 
@@ -127,12 +129,14 @@ class Connection(object):
             raise ValueError("'transport' must be one of %s"
                              % ", ".join(THRIFT_TRANSPORTS.keys()))
 
-        if table_prefix is not None \
-                and not isinstance(table_prefix, str):
-            raise TypeError("'table_prefix' must be a string")
+        if table_prefix is not None:
+            if not isinstance(table_prefix, STRING_OR_BINARY):
+                raise TypeError("'table_prefix' must be a string")
+            table_prefix = ensure_bytes(table_prefix)
 
-        if not isinstance(table_prefix_separator, str):
+        if not isinstance(table_prefix_separator, STRING_OR_BINARY):
             raise TypeError("'table_prefix_separator' must be a string")
+        table_prefix_separator = ensure_bytes(table_prefix_separator)
 
         if compat not in COMPAT_MODES:
             raise ValueError("'compat' must be one of %s"
@@ -176,9 +180,9 @@ class Connection(object):
 
     def _table_name(self, name):
         """Construct a table name by optionally adding a table name prefix."""
+        name = ensure_bytes(name)
         if self.table_prefix is None:
             return name
-
         return self.table_prefix + self.table_prefix_separator + name
 
     def open(self):
@@ -238,6 +242,7 @@ class Connection(object):
         :return: Table instance
         :rtype: :py:class:`Table`
         """
+        name = ensure_bytes(name)
         if use_prefix:
             name = self._table_name(name)
         return Table(name, self)
