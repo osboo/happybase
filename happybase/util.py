@@ -48,7 +48,7 @@ def pep8_to_camel_case(name, initial=False):
 
 def thrift_attrs(obj_or_cls):
     """Obtain Thrift data type attribute names for an instance or class."""
-    return [v[1] for v in obj_or_cls.thrift_spec.values()]
+    return [v[2] for v in obj_or_cls.thrift_spec[1:]]
 
 
 def thrift_type_to_dict(obj):
