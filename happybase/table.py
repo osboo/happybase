@@ -4,8 +4,9 @@ HappyBase table module.
 
 import logging
 from numbers import Integral
-from operator import attrgetter
 from struct import Struct
+
+from six import iteritems
 
 from .hbase.ttypes import TScan
 from .util import thrift_type_to_dict, bytes_increment, OrderedDict
@@ -13,23 +14,27 @@ from .batch import Batch
 
 logger = logging.getLogger(__name__)
 
-make_cell = attrgetter('value')
-make_cell_timestamp = attrgetter('value', 'timestamp')
 pack_i64 = Struct('>q').pack
 
 
 def make_row(cell_map, include_timestamp):
     """Make a row dict for a cell mapping like ttypes.TRowResult.columns."""
-    cellfn = include_timestamp and make_cell_timestamp or make_cell
-    return dict((cn, cellfn(cell)) for cn, cell in cell_map.items())
+    return {
+        name: (cell.value, cell.timestamp) if include_timestamp else cell.value
+        for name, cell in iteritems(cell_map)
+    }
 
 
 def make_ordered_row(sorted_columns, include_timestamp):
     """Make a row dict for sorted column results from scans."""
-    cellfn = include_timestamp and make_cell_timestamp or make_cell
-    return OrderedDict(
-        (column.columnName, cellfn(column.cell))
-        for column in sorted_columns)
+    od = OrderedDict()
+    for column in sorted_columns:
+        if include_timestamp:
+            value = (column.cell.value, column.cell.timestamp)
+        else:
+            value = column.cell.value
+        od[column.columnName] = value
+    return od
 
 
 class Table(object):
