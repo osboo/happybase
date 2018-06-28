@@ -92,12 +92,13 @@ class Table(object):
         argument and returns the columns and values for this row as
         a dictionary.
 
-        The `row` argument is the row key of the row. If the `columns` argument
-        is specified, only the values for these columns will be returned
-        instead of all available columns. The `columns` argument should be
-        a list or tuple containing strings. Each name can be a column family,
-        such as `cf1` or `cf1:` (the trailing colon is not required), or
-        a column family with a qualifier, such as `cf1:col1`.
+        The `row` argument is the row key of the row. If the `columns`
+        argument is specified, only the values for these columns will be
+        returned instead of all available columns. The `columns`
+        argument should be a list or tuple containing byte strings. Each
+        name can be a column family, such as ``b'cf1'`` or ``b'cf1:'``
+        (the trailing colon is not required), or a column family with a
+        qualifier, such as ``b'cf1:col1'``.
 
         If specified, the `timestamp` argument specifies the maximum version
         that results may have. The `include_timestamp` argument specifies
@@ -266,6 +267,11 @@ class Table(object):
         by this scanner will be retrieved in sorted order, and the data
         will be stored in `OrderedDict` instances.
 
+        If `reverse` is `True`, the scanner will perform the scan in reverse.
+        This means that `row_start` must be lexicographically after `row_stop`.
+        Note that the start of the range is inclusive, while the end is
+        exclusive just as in the forward scan.
+
         **Compatibility notes:**
 
         * The `filter` argument is only available when using HBase 0.92
@@ -274,6 +280,12 @@ class Table(object):
 
         * The `sorted_columns` argument is only available when using
           HBase 0.96 (or up).
+
+        * The `reverse` argument is only available when using HBase 0.98
+          (or up).
+
+        .. versionadded:: 1.1.0
+           `reverse` argument
 
         .. versionadded:: 0.8
            `sorted_columns` argument
@@ -288,7 +300,7 @@ class Table(object):
         :param str filter: a filter string (optional)
         :param int timestamp: timestamp (optional)
         :param bool include_timestamp: whether timestamps are returned
-        :param int batch_size: batch size for retrieving resuls
+        :param int batch_size: batch size for retrieving results
         :param bool scan_batching: server-side scan batching (optional)
         :param int limit: max number of rows to return
         :param bool sorted_columns: whether to return sorted columns
@@ -433,8 +445,8 @@ class Table(object):
         This method stores the data in the `data` argument for the row
         specified by `row`. The `data` argument is dictionary that maps columns
         to values. Column names must include a family and qualifier part, e.g.
-        `cf:col`, though the qualifier part may be the empty string, e.g.
-        `cf:`.
+        ``b'cf:col'``, though the qualifier part may be the empty string, e.g.
+        ``b'cf:'``.
 
         Note that, in many situations, :py:meth:`batch()` is a more appropriate
         method to manipulate data.
