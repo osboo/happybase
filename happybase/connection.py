@@ -318,7 +318,7 @@ class Connection(object):
                 options = dict()
 
             kwargs = dict()
-            for option_name, value in options.iteritems():
+            for option_name, value in six.iteritems(options):
                 kwargs[pep8_to_camel_case(option_name)] = value
 
             if not cf_name.endswith(':'):
