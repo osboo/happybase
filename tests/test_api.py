@@ -29,6 +29,8 @@ HAPPYBASE_HOST = os.environ.get('HAPPYBASE_HOST')
 HAPPYBASE_PORT = os.environ.get('HAPPYBASE_PORT')
 HAPPYBASE_COMPAT = os.environ.get('HAPPYBASE_COMPAT', '0.98')
 HAPPYBASE_TRANSPORT = os.environ.get('HAPPYBASE_TRANSPORT', 'buffered')
+HAPPYBASE_USE_KERBEROS = os.environ.get('HAPPYBASE_USE_KERBEROS', 'false')=='true'
+HAPPYBASE_SASL_SERVICE_NAME = os.environ.get('HAPPYBASE_SASL_SERVICE_NAME', 'hbase')
 KEEP_TABLE = ('HAPPYBASE_NO_CLEANUP' in os.environ)
 
 TABLE_PREFIX = b'happybase_tests_tmp'
@@ -40,6 +42,8 @@ connection_kwargs = dict(
     table_prefix=TABLE_PREFIX,
     compat=HAPPYBASE_COMPAT,
     transport=HAPPYBASE_TRANSPORT,
+    use_kerberos=HAPPYBASE_USE_KERBEROS,
+    sasl_service_name=HAPPYBASE_SASL_SERVICE_NAME
 )
 
 
