@@ -457,7 +457,7 @@ class Table(object):
         :param str row: the row key
         :param dict data: the data to store
         :param int timestamp: timestamp (optional)
-        :param wal bool: whether to write to the WAL (optional)
+        :param bool wal: whether to write to the WAL (optional)
         """
         with self.batch(timestamp=timestamp, wal=wal) as batch:
             batch.put(row, data)
@@ -477,7 +477,7 @@ class Table(object):
         :param str row: the row key
         :param list_or_tuple columns: list of columns (optional)
         :param int timestamp: timestamp (optional)
-        :param wal bool: whether to write to the WAL (optional)
+        :param bool wal: whether to write to the WAL (optional)
         """
         with self.batch(timestamp=timestamp, wal=wal) as batch:
             batch.delete(row, columns)
@@ -515,7 +515,7 @@ class Table(object):
                                  context manager)
         :param int batch_size: batch size (optional)
         :param int timestamp: timestamp (optional)
-        :param wal bool: whether to write to the WAL (optional)
+        :param bool wal: whether to write to the WAL (optional)
 
         :return: Batch instance
         :rtype: :py:class:`Batch`

@@ -114,8 +114,8 @@ class Connection(object):
     :param int port: The port to connect to
     :param int timeout: The socket timeout in milliseconds (optional)
     :param bool autoconnect: Whether the connection should be opened directly
-    :param str table_prefix: Prefix used to construct table names (optional)
-    :param str table_prefix_separator: Separator used for `table_prefix`
+    :param str_or_bytes table_prefix: Prefix used to construct table names (optional)
+    :param str_or_bytes table_prefix_separator: Separator used for `table_prefix`
     :param str compat: Compatibility mode (optional)
     :param str transport: Thrift transport mode (optional)
     """
@@ -172,9 +172,11 @@ class Connection(object):
         if self.timeout is not None:
             socket.setTimeout(self.timeout)
 
-        self.transport = self._transport_class(socket)
         if self.use_kerberos:
-            self.transport = TSaslClientTransport(self.transport, self.host, self.sasl_service_name)
+            self.transport = TSaslClientTransport(socket, self.host, self.sasl_service_name)
+        else:
+            self.transport = self._transport_class(socket)
+
         protocol = self._protocol_class(self.transport)
         self.client = Client(protocol)
 
@@ -237,7 +239,7 @@ class Connection(object):
         argument to the :py:class:`Connection` constructor for more
         information.
 
-        :param str name: the name of the table
+        :param str_or_bytes name: the name of the table
         :param bool use_prefix: whether to use the table prefix (if any)
         :return: Table instance
         :rtype: :py:class:`Table`
@@ -273,7 +275,7 @@ class Connection(object):
     def create_table(self, name, families):
         """Create a table.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
         :param dict families: The name and options for each column family
 
         The `families` argument is a dictionary mapping column family
@@ -339,7 +341,7 @@ class Connection(object):
         deleted. If the `disable` argument is `True`, this method first
         disables the table if it wasn't already and then deletes it.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
         :param bool disable: Whether to first disable the table if needed
         """
         if disable and self.is_table_enabled(name):
@@ -351,7 +353,7 @@ class Connection(object):
     def enable_table(self, name):
         """Enable the specified table.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
         """
         name = self._table_name(name)
         self.client.enableTable(name)
@@ -359,7 +361,7 @@ class Connection(object):
     def disable_table(self, name):
         """Disable the specified table.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
         """
         name = self._table_name(name)
         self.client.disableTable(name)
@@ -367,7 +369,7 @@ class Connection(object):
     def is_table_enabled(self, name):
         """Return whether the specified table is enabled.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
 
         :return: whether the table is enabled
         :rtype: bool
@@ -378,7 +380,7 @@ class Connection(object):
     def compact_table(self, name, major=False):
         """Compact the specified table.
 
-        :param str name: The table name
+        :param str_or_bytes name: The table name
         :param bool major: Whether to perform a major compaction.
         """
         name = self._table_name(name)
