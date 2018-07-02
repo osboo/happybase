@@ -105,7 +105,7 @@ class Table(object):
         whether cells are returned as single values or as `(value, timestamp)`
         tuples.
 
-        :param str row: the row key
+        :param bytes row: the row key
         :param list_or_tuple columns: list of columns (optional)
         :param int timestamp: timestamp (optional)
         :param bool include_timestamp: whether timestamps are returned
@@ -295,7 +295,7 @@ class Table(object):
 
         :param str row_start: the row key to start at (inclusive)
         :param str row_stop: the row key to stop at (exclusive)
-        :param str row_prefix: a prefix of the row key that must match
+`       :param str_or_bytes row_prefix: a prefix of the row key that must match
         :param list_or_tuple columns: list of columns (optional)
         :param str filter: a filter string (optional)
         :param int timestamp: timestamp (optional)
@@ -454,7 +454,7 @@ class Table(object):
         .. versionadded:: 0.7
            `wal` argument
 
-        :param str row: the row key
+        :param bytes row: the row key
         :param dict data: the data to store
         :param int timestamp: timestamp (optional)
         :param bool wal: whether to write to the WAL (optional)
@@ -539,7 +539,7 @@ class Table(object):
         :py:meth:`Table.counter_inc` and :py:meth:`Table.counter_dec` methods
         for that.
 
-        :param str row: the row key
+        :param str_or_bytes row: the row key
         :param str column: the column name
 
         :return: counter value
@@ -560,7 +560,7 @@ class Table(object):
         :py:meth:`Table.counter_inc` and :py:meth:`Table.counter_dec` methods
         for that.
 
-        :param str row: the row key
+        :param str_or_bytes row: the row key
         :param str column: the column name
         :param int value: the counter value to set
         """
@@ -575,7 +575,7 @@ class Table(object):
         negative values). If the counter column did not exist, it is
         automatically initialised to 0 before incrementing it.
 
-        :param str row: the row key
+        :param str_or_bytes row: the row key
         :param str column: the column name
         :param int value: the amount to increment or decrement by (optional)
 
