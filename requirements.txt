@@ -1,3 +1,3 @@
-git+https://github.com/TimoshinNikita/pure-sasl.git@wrap_fix#egg=pure-sasl
+pure-sasl>=0.5.1
 kerberos
-git+https://github.com/TimoshinNikita/apache_thrift.git@master#egg=thrift
+thrift>=0.11.0
